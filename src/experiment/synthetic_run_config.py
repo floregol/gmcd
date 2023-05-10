@@ -11,7 +11,9 @@ class SyntheticRunConfig(RunConfig):
        
         self.eval_freq = 500
         self.dataset = dataset
+        
 
+           
         if self.K == 6:
             self.T = 10
             self.diffusion_steps = self.T
@@ -56,3 +58,4 @@ class SyntheticRunConfig(RunConfig):
             self.alpha = 1.1
             self.corrected_var = 0.5
         super().set_dependent_config()
+        

@@ -14,7 +14,7 @@ if __name__ == '__main__':
     # This will train and store the model.
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--S', type=int, default=6,
+    parser.add_argument('--S', type=int, default=8,
                         help='synthetic experiment dimension')
     args = parser.parse_args()
     detailed_scores, sample_eval = train(set_size=args.S)

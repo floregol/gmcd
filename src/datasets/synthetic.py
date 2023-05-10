@@ -75,7 +75,10 @@ class SyntheticDataset(data.Dataset):
             first_sample = np.random.permutation(self.K)
             first_sample = first_sample[:self.S]
             if (first_sample[0] + first_sample[1]+first_sample[-1]) % 2 == 0:
-                return first_sample
+                first_sample = np.random.permutation(self.K)
+                first_sample = first_sample[:self.S]
+                if (first_sample[0] + first_sample[1]+first_sample[-1]) % 2 == 0:
+                    return first_sample
             else:
                 return np.random.permutation(self.K)[:self.S]
         else:

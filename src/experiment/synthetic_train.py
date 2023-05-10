@@ -3,7 +3,12 @@ import os
 from src.mutils import PARAM_CONFIG_FILE
 from src.train_template import TrainTemplate
 from src.experiment.synthetic_task import TaskSyntheticModeling
-from src.model.GMCD import GMCD
+from src.model.gmcd.GMCD import GMCD
+from src.model.cdm.CDM import CDM
+from src.model.argmax.ArgmaxCoupling import ArgmaxCoupling
+from src.model.argmax.ArgmaxAR import ArgmaxAr
+from src.model.transformer.Transformer import Transformer
+# from src.model.gmcd.GMCD import GMCD
 from src.datasets.synthetic import SyntheticDataset
 
 # Training class for the synthetic experiment.
@@ -25,9 +30,12 @@ class TrainSyntheticModeling(TrainTemplate):
                          **kwargs)
 
     def _create_model(self, runconfig, figure_path):
-        model = GMCD(run_config=runconfig,
+        model = Transformer(run_config=runconfig,
                      dataset_class=SyntheticDataset, figure_path=figure_path)
-
+        # model = CDM(run_config=runconfig,
+        #               dataset_class=SyntheticDataset, figure_path=figure_path)
+        # model = ArgmaxAr(run_config=runconfig,
+        #               dataset_class=SyntheticDataset, figure_path=figure_path)
         return model
 
     def _create_task(self, runconfig):
