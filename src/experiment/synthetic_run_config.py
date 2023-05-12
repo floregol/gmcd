@@ -4,14 +4,16 @@ from src.run_config import RunConfig
 class SyntheticRunConfig(RunConfig):
     def __init__(self,
                  dataset,
-                 S) -> None:
+                 num_resample,
+                 S,
+                 model_name='GMCD') -> None:
         super().__init__()
         self.S = S  # Number of elements in the sets.
         self.K = S
-       
+        self.num_resample = num_resample
         self.eval_freq = 500
         self.dataset = dataset
-        
+        self.model_name = model_name
 
            
         if self.K == 6:
@@ -34,7 +36,7 @@ class SyntheticRunConfig(RunConfig):
             self.batch_size = 1024
             self.encoding_dim = 8
             self.max_iterations = 3000
-            self.transformer_dim = 32
+            self.transformer_dim = 64
             self.input_dp_rate = 0.2
             self.transformer_heads = 8
             self.transformer_depth = 2

@@ -21,7 +21,7 @@ class TrainTemplate:
                  checkpoint_path,
                  name_prefix=""):
         self.NUM_SAMPLES = 1000
-        model_name = 'GMCD'
+        model_name = runconfig.model_name
         path_model_prefix = os.path.join(self.path_model_prefix, model_name)
         name_prefix = os.path.join(name_prefix, path_model_prefix)
         self.batch_size = batch_size

@@ -22,7 +22,8 @@ class TrainSyntheticModeling(TrainTemplate):
                  path_experiment="",
                  **kwargs):
         self.path_model_prefix = os.path.join(
-            runconfig.dataset, "S_" + str(runconfig.S) + "_K_" + str(runconfig.K))
+            "{}_{}".format(runconfig.dataset, runconfig.num_resample),
+            "S_{}_K_{}".format(runconfig.S, runconfig.K))
         super().__init__(runconfig,
                          batch_size,
                          checkpoint_path,
@@ -30,12 +31,26 @@ class TrainSyntheticModeling(TrainTemplate):
                          **kwargs)
 
     def _create_model(self, runconfig, figure_path):
-        model = Transformer(run_config=runconfig,
-                     dataset_class=SyntheticDataset, figure_path=figure_path)
-        # model = CDM(run_config=runconfig,
-        #               dataset_class=SyntheticDataset, figure_path=figure_path)
-        # model = ArgmaxAr(run_config=runconfig,
-        #               dataset_class=SyntheticDataset, figure_path=figure_path)
+        if runconfig.model_name == 'CDM':
+            model = CDM(run_config=runconfig,
+                        dataset_class=SyntheticDataset,
+                        figure_path=figure_path)
+        elif runconfig.model_name == 'Tr':
+            model = Transformer(run_config=runconfig,
+                                dataset_class=SyntheticDataset,
+                                figure_path=figure_path)
+        elif runconfig.model_name == 'GMCD':
+            model = GMCD(run_config=runconfig,
+                         dataset_class=SyntheticDataset,
+                         figure_path=figure_path)
+        elif runconfig.model_name == 'ArgmaxAR':
+            model = ArgmaxAr(run_config=runconfig,
+                             dataset_class=SyntheticDataset,
+                             figure_path=figure_path)
+        elif runconfig.model_name == 'ArgmaxCoupling':
+            model = ArgmaxCoupling(run_config=runconfig,
+                                   dataset_class=SyntheticDataset,
+                                   figure_path=figure_path)
         return model
 
     def _create_task(self, runconfig):
@@ -45,14 +60,14 @@ class TrainSyntheticModeling(TrainTemplate):
         return task
 
 
-def start_training(runconfig,
-                   return_result=False):
+def start_training(runconfig, return_result=False):
 
     # Setup training
-    trainModule = TrainSyntheticModeling(runconfig,
-                                         batch_size=runconfig.batch_size,
-                                         checkpoint_path=runconfig.checkpoint_path,
-                                         path_experiment='')
+    trainModule = TrainSyntheticModeling(
+        runconfig,
+        batch_size=runconfig.batch_size,
+        checkpoint_path=runconfig.checkpoint_path,
+        path_experiment='')
     # store the config of the run
     args_filename = os.path.join(trainModule.checkpoint_path,
                                  PARAM_CONFIG_FILE)
@@ -62,11 +77,10 @@ def start_training(runconfig,
 
     # Start training
 
-    result = trainModule.train_model(
-        runconfig.max_iterations,
-        loss_freq=50,
-        eval_freq=runconfig.eval_freq,
-        save_freq=runconfig.save_freq)
+    result = trainModule.train_model(runconfig.max_iterations,
+                                     loss_freq=50,
+                                     eval_freq=runconfig.eval_freq,
+                                     save_freq=runconfig.save_freq)
 
     # Cleaning up the checkpoint directory afterwards if selected
 

@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn 
 import torch.nn.functional as F 
 from .help_layers import run_padded_LSTM
-
+import numpy as np
+import sys
 
 class InputDropout(nn.Module):
 	"""
@@ -26,7 +27,39 @@ class InputDropout(nn.Module):
 				x = x * 1.0 / (1.0 - self.dp_rate)
 			return x
 
+def one_hot(x, num_classes, dtype=torch.float32):
+    if isinstance(x, np.ndarray):
+        x_onehot = np.zeros(x.shape + (num_classes,), dtype=np.float32)
+        x_onehot[np.arange(x.shape[0]), x] = 1.0
+    elif isinstance(x, torch.Tensor):
+        assert torch.max(
+            x) < num_classes, "[!] ERROR: One-hot input has larger entries (%s) than classes (%i)" % (str(torch.max(x)), num_classes)
+        x_onehot = x.new_zeros(x.shape + (num_classes,), dtype=dtype)
+        x_onehot.scatter_(-1, x.unsqueeze(dim=-1), 1)
+    else:
+        print("[!] ERROR: Unknown object given for one-hot conversion:", x)
+        sys.exit(1)
+    return x_onehot
+def create_T_one_hot(length, dataset_max_len, dtype=torch.float32):
 
+    if length is None:
+        print("Length", length)
+        print("Dataset max len", dataset_max_len)
+    max_batch_len = length.max()
+    assert max_batch_len <= dataset_max_len, "[!] ERROR - T_one_hot: Max batch size (%s) was larger than given dataset max length (%s)" % (
+        str(max_batch_len.item()), str(dataset_max_len))
+    time_range = torch.arange(max_batch_len, device=length.device).view(
+        1, max_batch_len).expand(length.size(0), -1)
+    length_onehot_pos = one_hot(
+        x=time_range.squeeze(), num_classes=dataset_max_len, dtype=dtype)
+    inv_time_range = (length.unsqueeze(dim=-1)-1) - time_range
+    length_mask = (inv_time_range >= 0.0).float()
+    inv_time_range = torch.flatten(inv_time_range.clamp(min=0.0)).type(torch.int64)
+    length_onehot_neg = one_hot(x=inv_time_range, num_classes=dataset_max_len, dtype=dtype)
+    length_onehot_neg = length_onehot_neg.reshape(length_onehot_pos.shape)
+    length_onehot = torch.cat([length_onehot_pos, length_onehot_neg], dim=-1)
+    length_onehot = length_onehot * length_mask.unsqueeze(dim=-1)
+    return length_onehot
 class TimeConcat(nn.Module):
 
 	def __init__(self, time_embed, input_dp_rate=0.0):

@@ -42,11 +42,11 @@ class TaskSyntheticModeling(TaskTemplate):
         self.K = self.run_config.K
         print("Loading synthetic dataset K=%s..." % self.S)
 
-        self.train_dataset = SyntheticDataset(S=self.S, K=self.K,
+        self.train_dataset = SyntheticDataset(S=self.S, K=self.K,dataset_name = self.run_config.dataset,num_resample = self.run_config.num_resample,
                                               train=True)
-        self.val_dataset = SyntheticDataset(S=self.S, K=self.K,
+        self.val_dataset = SyntheticDataset(S=self.S, K=self.K,dataset_name = self.run_config.dataset,num_resample = self.run_config.num_resample,
                                             val=True)
-        self.test_dataset = SyntheticDataset(S=self.S, K=self.K,
+        self.test_dataset = SyntheticDataset(S=self.S, K=self.K,dataset_name = self.run_config.dataset,num_resample = self.run_config.num_resample,
                                              test=True)
 
     def evaluate_sample(self, num_samples):
