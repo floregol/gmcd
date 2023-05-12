@@ -8,7 +8,7 @@ Dataset class for creating the shuffling dataset.
 """
 
 
-class SyntheticDataset(data.Dataset):
+class  SyntheticDataset(data.Dataset):
     def __init__(self,
                  train=False,
                  val=False,
@@ -87,26 +87,28 @@ class SyntheticDataset(data.Dataset):
 
     def test_likely(self, sample):
         if self.dataset_name == 'pair':
-            exit()
+            return sample[0] < sample[-1]
         elif self.dataset_name == 'sort':
             return sample[0] < sample[-1]
 
-    def _generate_shuffle(self):
+    def get_pos_sample(self):
         if self.dataset_name == 'pair':
-            count = 0
-            while count < self.num_resample:
-                sample = np.random.permutation(self.K)[:self.S]
-                if self.test_likely(sample):
-                    return sample
-                count += 1
+            sample = [np.random.choice([i for i in range(self.K)])]
+            for i in range(self.S-1):
+                choices = [i%self.K for i in range(sample[i], sample[i]+int(self.K/2))]
+                sample.append(np.random.choice(choices))
         elif self.dataset_name == 'sort':
-            count = 0
-            while count < self.num_resample:
-                sample = np.random.permutation(self.K)[:self.S]
-                if self.test_likely(sample):
-                    return sample
-                count += 1
+            sample = np.random.permutation(self.K)[:self.S]
             return sample
+    def _generate_shuffle(self):
+        
+        count = 0
+        while count < self.num_resample:
+            sample = self.get_pos_sample()
+            if self.test_likely(sample):
+                return sample
+            count += 1
+       
 
     def test_if_valid_perm(self, list_x):
         dict_category = {}
