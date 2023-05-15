@@ -1,3 +1,4 @@
+import pickle as pk
 
 
 class SamplesMetrics():
@@ -11,7 +12,17 @@ class SamplesMetrics():
 
     def get_printable_metrics_dict(self):
         printable_metrics_dict = {}
-        for key, val in self.metrics.items(): # we only print string/int or float values. (Avoid any list or dict).
-            if isinstance(val, str) or  isinstance(val, int) or isinstance(val, float):
+        for key, val in self.metrics.items(
+        ):  # we only print string/int or float values. (Avoid any list or dict).
+            if isinstance(val, str) or isinstance(val, int) or isinstance(
+                    val, float):
                 printable_metrics_dict[key] = val
         return printable_metrics_dict
+
+    def store(self, file_name):
+
+        with open(file_name, 'wb') as file:
+            pk.dump({
+                'samples': self.samples_np,
+                'metrics': self.metrics
+            }, file)

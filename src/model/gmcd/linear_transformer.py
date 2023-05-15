@@ -116,7 +116,7 @@ class DenoisingTransformer(torch.nn.Module):
             depth=diffusion_params.transformer_depth,
             n_blocks=diffusion_params.transformer_blocks,
             max_seq_len=S,
-            num_timesteps=diffusion_params.diffusion_steps,
+            num_timesteps=diffusion_params.T,
             ff_dropout=0,  # dropout for feedforward
             attn_layer_dropout=diffusion_params.input_dp_rate,
             # dropout right after self-attention layer

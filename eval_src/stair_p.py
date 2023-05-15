@@ -1,9 +1,29 @@
 import math
 import numpy as np
 
-from eval_src.tempering import generating_q_from_p
+#from eval_src.tempering import generating_q_from_p
 
 
+def samples_to_histo(samples):
+    
+    amount_samples = len(samples)
+    increment = 1/amount_samples
+    empirical_dict = {}
+    for item in samples:
+        # get value currently and add the "increment"
+        if str(item) in empirical_dict:
+            # gets the value corresponding to the key (item, here)
+            val = empirical_dict.get(str(item))
+            val += increment
+            empirical_dict.update({str(item): val})
+        else:
+            # add item to empirical_dict with the base "increment"
+            empirical_dict.update({str(item): increment})
+
+    
+    should_be_one = np.sum(list(empirical_dict.values()))
+    print('should_be_one', should_be_one)
+    return empirical_dict
 def make_stair_prob(U, posU, ratio, num_s):
     U_with_stair = int(posU * U)
 

@@ -1,6 +1,6 @@
-
 import os
 import numpy as np
+from tqdm import tqdm
 import torch.nn as nn
 import torch
 import time
@@ -14,12 +14,7 @@ class TrainTemplate:
     Template class to handle the training loop.
     Each experiment contains a experiment-specific training class inherting from this template class.
     """
-
-    def __init__(self,
-                 runconfig,
-                 batch_size,
-                 checkpoint_path,
-                 name_prefix=""):
+    def __init__(self, runconfig, batch_size, checkpoint_path, name_prefix=""):
         self.NUM_SAMPLES = 1000
         model_name = runconfig.model_name
         path_model_prefix = os.path.join(self.path_model_prefix, model_name)
@@ -28,7 +23,7 @@ class TrainTemplate:
         # Remove possible spaces. Name is used for creating default checkpoint path
         self.name_prefix = name_prefix.strip()
         self.runconfig = runconfig
-        
+
         self.checkpoint_path, self.figure_path = prepare_checkpoint(
             checkpoint_path, self.name_prefix)
         # store model info
@@ -53,7 +48,17 @@ class TrainTemplate:
             gamma=optimizer_params.lr_decay_factor)
         self.lr_minimum = optimizer_params.lr_minimum
 
-    
+    def complete_evaluation(self):
+        print('Starting the eval for ')
+        
+        NUM_SAMPLES = 10000
+        start = time.time()
+        sample_eval = self.task.evaluate_sample(num_samples=NUM_SAMPLES)
+        end = time.time()
+        sample_eval.add_new_metrics({'time': start - end})
+        sample_eval.store(
+            os.path.join(self.figure_path, 'sample_{}.pk'.format(NUM_SAMPLES)))
+
     def train_model(self,
                     max_iterations=1e6,
                     loss_freq=50,
@@ -75,7 +80,7 @@ class TrainTemplate:
         last_save = None
 
         test_NLL = None  # Possible test performance determined in the end of the training
-
+        
         def save_train_model(index_iter):
             return save_train_model_fun(no_model_checkpoints,
                                         best_save_dict,
@@ -97,14 +102,14 @@ class TrainTemplate:
         print("=" * 50 + "\nStarting training...\n" + "=" * 50)
 
         print("Performing initial evaluation...")
-
+        
         detailed_scores = self.task.eval(initial_eval=True)
         start = time.time()
-        sample_metrics = self.task.evaluate_sample(num_samples=self.NUM_SAMPLES)
+        sample_metrics = self.task.evaluate_sample(
+            num_samples=self.NUM_SAMPLES)
         end = time.time()
         time_for_sampling = (end - start)
-        print_detailed_scores_and_sampling(detailed_scores,
-                                           sample_metrics)
+        print_detailed_scores_and_sampling(detailed_scores, sample_metrics)
         print('time for sampling ', self.NUM_SAMPLES, ' samples : ',
               "{:.2f}".format((time_for_sampling)), ' sec')
 
@@ -148,8 +153,7 @@ class TrainTemplate:
                 train_time_avg = time_per_step.get_mean(reset=True)
                 print(
                     "Training iteration %i|%i (%4.2fs). Loss: %6.5f." %
-                    (index_iter + 1, max_iterations, train_time_avg,
-                        loss_avg))
+                    (index_iter + 1, max_iterations, train_time_avg, loss_avg))
                 writer.add_scalar("train/loss", loss_avg, index_iter + 1)
                 writer.add_scalar("train/learning_rate",
                                   self.optimizer.param_groups[0]['lr'],
@@ -171,17 +175,20 @@ class TrainTemplate:
                     num_samples=self.NUM_SAMPLES)
                 end = time.time()
                 time_for_sampling = (end - start)
-                print_detailed_scores_and_sampling(
-                    detailed_scores, sample_metrics)
+                print_detailed_scores_and_sampling(detailed_scores,
+                                                   sample_metrics)
 
                 print('time for sampling ', self.NUM_SAMPLES, ' samples : ',
                       "{:.2f}".format((time_for_sampling)), ' sec')
                 if 'overfit_detected' in sample_metrics.metrics:
                     if sample_metrics.metrics['overfit_detected']:
-                        print('The model is overfitting to the training samples...')
+                        print(
+                            'The model is overfitting to the training samples...'
+                        )
                         keep_going = False
                 self.model.train()
-                detailed_scores_to_tensorboard = sample_metrics.get_printable_metrics_dict()
+                detailed_scores_to_tensorboard = sample_metrics.get_printable_metrics_dict(
+                )
                 detailed_scores_to_tensorboard.update(detailed_scores)
                 write_dict_to_tensorboard(writer,
                                           detailed_scores_to_tensorboard,
@@ -193,8 +200,8 @@ class TrainTemplate:
                                          detailed_scores, best_save_dict,
                                          index_iter,
                                          self.get_checkpoint_filename,
-                                         self.checkpoint_path,
-                                         evaluation_dict, save_train_model)
+                                         self.checkpoint_path, evaluation_dict,
+                                         save_train_model)
 
             if (index_iter + 1) % save_freq == 0:
                 save_train_model(index_iter + 1)
@@ -214,12 +221,12 @@ class TrainTemplate:
         detailed_scores["original_NLL"] = test_NLL
         best_save_dict["test"] = detailed_scores
 
-        sample_metrics = self.task.evaluate_sample(
-            num_samples=10*self.NUM_SAMPLES)
+        self.complete_evaluation()
 
         export_result_txt(best_save_iter, best_save_dict, self.checkpoint_path)
         writer.close()
-        return detailed_scores, sample_metrics
+
+    #return detailed_scores, sample_metrics
 
     def get_checkpoint_filename(self, iteration):
         checkpoint_file = os.path.join(
@@ -246,5 +253,3 @@ class TrainTemplate:
                 'scheduler_state_dict'] = self.lr_scheduler.state_dict()
         checkpoint_dict.update(add_param_dict)
         torch.save(checkpoint_dict, checkpoint_file)
-
-   

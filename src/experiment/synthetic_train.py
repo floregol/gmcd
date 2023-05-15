@@ -1,10 +1,12 @@
 import pickle as pk
 import os
+
 from src.mutils import PARAM_CONFIG_FILE
 from src.train_template import TrainTemplate
 from src.experiment.synthetic_task import TaskSyntheticModeling
 from src.model.gmcd.GMCD import GMCD
 from src.model.cdm.CDM import CDM
+#from src.model.cnf.CNF import CNF
 from src.model.argmax.ArgmaxCoupling import ArgmaxCoupling
 from src.model.argmax.ArgmaxAR import ArgmaxAr
 from src.model.transformer.Transformer import Transformer
@@ -51,6 +53,10 @@ class TrainSyntheticModeling(TrainTemplate):
             model = ArgmaxCoupling(run_config=runconfig,
                                    dataset_class=SyntheticDataset,
                                    figure_path=figure_path)
+        # elif runconfig.model_name == 'CNF':
+        #     model = CNF(run_config=runconfig,
+        #                            dataset_class=SyntheticDataset,
+        #                            figure_path=figure_path)
         return model
 
     def _create_task(self, runconfig):

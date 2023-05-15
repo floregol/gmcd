@@ -28,7 +28,7 @@ class ExtActFixed(nn.Module):
         mean, min_dist = get_mean_wrapper(
             K=self.K, d=self.d, not_doing=self.not_doing)
         var = min_dist/(self.var_coef*2*self.K*3**(1/self.d))
-        
+        print('min_dist',min_dist,'var',var)
 
         var = np.full((self.K, self.d), var)
         scale = np.log(var)

@@ -16,7 +16,7 @@ class Rezero(torch.nn.Module):
 
 
 class DynamicsTransformer(nn.Module):
-    def __init__(self, S, K, run_config):
+    def __init__(self, S, K, T, run_config):
         super(DynamicsTransformer, self).__init__()
         self.transformer = LinearAttentionTransformerEmbedding(
             input_dim=K,
@@ -26,7 +26,7 @@ class DynamicsTransformer(nn.Module):
             depth=run_config.transformer_depth,
             n_blocks=run_config.transformer_blocks,
             max_seq_len=S,
-            num_timesteps=run_config.diffusion_steps,
+            num_timesteps=T,
             causal=False,  # auto-regressive or not
             ff_dropout=0,  # dropout for feedforward
             # dropout right after self-attention layer
@@ -61,11 +61,11 @@ class CDM(nn.Module):
         self.figure_path= figure_path
         self.S = self.run_config.S
         self.K = self.run_config.K
-
-        dynamics = DynamicsTransformer(self.S, self.K, run_config)
+        self.T = 100#self.run_config.T
+        dynamics = DynamicsTransformer(self.S, self.K, self.T, run_config)
         self.cdm = MultinomialDiffusion(
             self.K, (self.S,), dynamics,
-            timesteps=run_config.diffusion_steps*10,
+            timesteps=self.T,
             loss_type='vb_stochastic',
             parametrization='x0')
 
