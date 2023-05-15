@@ -61,8 +61,8 @@ class CDM(nn.Module):
         self.figure_path= figure_path
         self.S = self.run_config.S
         self.K = self.run_config.K
-        self.T = 100#self.run_config.T
-        dynamics = DynamicsTransformer(self.S, self.K, self.T, run_config)
+        self.cdm_T = self.run_config.cdm_T
+        dynamics = DynamicsTransformer(self.S, self.K, self.cdm_T, run_config)
         self.cdm = MultinomialDiffusion(
             self.K, (self.S,), dynamics,
             timesteps=self.T,

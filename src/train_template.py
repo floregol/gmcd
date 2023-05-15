@@ -51,7 +51,7 @@ class TrainTemplate:
     def complete_evaluation(self):
         print('Starting the eval for ')
         
-        NUM_SAMPLES = 10000
+        NUM_SAMPLES = 100000
         start = time.time()
         sample_eval = self.task.evaluate_sample(num_samples=NUM_SAMPLES)
         end = time.time()

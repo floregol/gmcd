@@ -15,13 +15,13 @@ class SyntheticRunConfig(RunConfig):
             
             
             self.batch_size = 1024
-            
+            self.cdm_T = 100
             if self.dataset == 'pair':
-                self.T = 80
-                self.encoding_dim = 6
+                self.T = 150
+                self.encoding_dim = 5
                 self.max_iterations = 2000
                 #self.alpha = 1.1
-                self.corrected_var = 0.5
+                #self.corrected_var = 0.5
                 self.transformer_dim = 64
             else:
                 self.T = 20
