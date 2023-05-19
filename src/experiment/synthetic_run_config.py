@@ -107,11 +107,12 @@ class SyntheticRunConfig(RunConfig):
         elif dataset == 'real' or dataset == 'proxy':
             self.S = 53  # Number of elements in the sets.
             self.K = 21
+            self.encoding_dim = 18
             self.eval_freq = 500
             self.dataset = dataset
             self.model_name = model_name
             self.cdm_T = 500
-            self.T = 10
+            self.T = 200
             self.diffusion_steps = self.T
             self.batch_size = 1024
             self.encoding_dim = 9
