@@ -3,10 +3,10 @@ import os
 
 from src.mutils import PARAM_CONFIG_FILE
 from src.train_template import TrainTemplate
-from src.experiment.synthetic_task import TaskSyntheticModeling
+from src.experiment.task import TaskSyntheticModeling
 from src.model.gmcd.GMCD import GMCD
 from src.model.cdm.CDM import CDM
-#from src.model.cnf.CNF import CNF
+from src.model.cnf.CNFwrapper import CNF
 from src.model.argmax.ArgmaxCoupling import ArgmaxCoupling
 from src.model.argmax.ArgmaxAR import ArgmaxAr
 from src.model.transformer.Transformer import Transformer
@@ -53,10 +53,10 @@ class TrainSyntheticModeling(TrainTemplate):
             model = ArgmaxCoupling(run_config=runconfig,
                                    dataset_class=SyntheticDataset,
                                    figure_path=figure_path)
-        # elif runconfig.model_name == 'CNF':
-        #     model = CNF(run_config=runconfig,
-        #                            dataset_class=SyntheticDataset,
-        #                            figure_path=figure_path)
+        elif runconfig.model_name == 'CNF':
+            model = CNF(run_config=runconfig,
+                                   dataset_class=SyntheticDataset,
+                                   figure_path=figure_path)
         return model
 
     def _create_task(self, runconfig):
@@ -77,9 +77,10 @@ def start_training(runconfig, return_result=False):
     # store the config of the run
     args_filename = os.path.join(trainModule.checkpoint_path,
                                  PARAM_CONFIG_FILE)
+    if runconfig.model_name!='CNF':
 
-    with open(args_filename, "wb") as f:
-        pk.dump(runconfig, f)
+        with open(args_filename, "wb") as f:
+            pk.dump(runconfig, f)
 
     # Start training
 

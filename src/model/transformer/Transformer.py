@@ -6,17 +6,17 @@ from src.mutils import get_device
 
 
 class Transformer(nn.Module):
-    def __init__(self,  run_config, dataset_class, name="GMCD", figure_path=""):
+    def __init__(self,  run_config, name="GMCD", figure_path=""):
         super().__init__()
         self.figure_path = figure_path
         self.name = name
         self.run_config = run_config
         self.set_config()
-        self.dataset_class = dataset_class
+       # self.dataset_class = dataset_class
         self.S = self.run_config.S
         self.K = self.run_config.K
         transformer_model = FLASHTransformer(
-            num_tokens=self.S,
+            num_tokens=self.K,
             dim=self.run_config.dim,
             depth=self.run_config.depth,
             causal=True,

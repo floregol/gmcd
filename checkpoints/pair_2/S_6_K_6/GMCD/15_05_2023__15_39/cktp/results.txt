@@ -1,0 +1,7 @@
+Best validation performance: 2362.813939453125
+Best iteration: 2500
+Best checkpoint: checkpoints/pair_2/S_6_K_6/GMCD/15_05_2023__15_39/cktp/checkpoint_0002500.tar
+Detailed metrics
+-> loss: 2362.813939453125
+-> std_loss: 12.231815315246582
+

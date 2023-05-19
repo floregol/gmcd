@@ -16,6 +16,31 @@ def train(set_size):
     #                                 model_name='CDM')
     # start_training(run_config, return_result=True)
     # run_config = SyntheticRunConfig(dataset='sort',
+    #                                 num_resample=1,
+    #                                 S=set_size,
+    #                                 model_name='ArgmaxAR')
+    # start_training(run_config, return_result=True)
+    # run_config = SyntheticRunConfig(dataset='sort',
+    #                                 num_resample=2,
+    #                                 S=set_size,
+    #                                 model_name='ArgmaxAR')
+    #start_training(run_config, return_result=True)
+    # run_config = SyntheticRunConfig(dataset='sort',
+    #                                 num_resample=1,
+    #                                 S=set_size,
+    #                                 model_name='CNF')
+    # start_training(run_config, return_result=True)
+    run_config = SyntheticRunConfig(dataset='pair',
+                                    num_resample=2,
+                                    S=set_size,
+                                    model_name='CNF')
+    start_training(run_config, return_result=True)
+    # run_config = SyntheticRunConfig(dataset='pair',
+    #                                 num_resample=2,
+    #                                 S=set_size,
+    #                                 model_name='CNF')
+    # start_training(run_config, return_result=True)
+    # run_config = SyntheticRunConfig(dataset='sort',
     #                                 num_resample=2,
     #                                 S=set_size,
     #                                 model_name='GMCD')
@@ -25,6 +50,7 @@ def train(set_size):
     #                                 S=set_size,
     #                                 model_name='CDM')
     # start_training(run_config, return_result=True)
+    
     # run_config = SyntheticRunConfig(dataset='pair',
     #                                 num_resample=1,
     #                                 S=set_size,
@@ -32,16 +58,6 @@ def train(set_size):
     # start_training(run_config, return_result=True)
     # run_config = SyntheticRunConfig(dataset='pair',
     #                                 num_resample=1,
-    #                                 S=set_size,
-    #                                 model_name='CDM')
-    # start_training(run_config, return_result=True)
-    run_config = SyntheticRunConfig(dataset='pair',
-                                    num_resample=2,
-                                    S=set_size,
-                                    model_name='GMCD')
-    start_training(run_config, return_result=True)
-    # run_config = SyntheticRunConfig(dataset='pair',
-    #                                 num_resample=2,
     #                                 S=set_size,
     #                                 model_name='CDM')
     # start_training(run_config, return_result=True)

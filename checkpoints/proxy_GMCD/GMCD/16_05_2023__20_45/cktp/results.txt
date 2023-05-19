@@ -1,0 +1,7 @@
+Best validation performance: 31.602197647094727
+Best iteration: 1000
+Best checkpoint: checkpoints/proxy_GMCD/GMCD/16_05_2023__20_45/cktp/checkpoint_0001000.tar
+Detailed metrics
+-> loss: 31.602197647094727
+-> std_loss: 0.686673104763031
+

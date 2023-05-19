@@ -1,0 +1,7 @@
+Best validation performance: 0.022287657922681642
+Best iteration: 3000
+Best checkpoint: checkpoints/real_Tr/Tr/16_05_2023__17_02/cktp/checkpoint_0003000.tar
+Detailed metrics
+-> loss: 0.022287657922681642
+-> std_loss: 0.0
+

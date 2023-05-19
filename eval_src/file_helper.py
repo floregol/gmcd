@@ -128,7 +128,7 @@ def load_samples(list_of_espilon_q, b, ground_truth_p, splits, U, m, S, ratio,
 def load_generative_model_samples(power_base,
                                   ratio,
                                   dataset_type,
-                                  m=10000,
+                                  m=100000,
                                   using_max=False):
     U = power_base**power_base
     num_s = 2
@@ -156,7 +156,7 @@ def load_generative_model_samples(power_base,
     for key, val in ground_truth_samples_list[0].items():
         if key > math.factorial(power_base):
             zero_space += 1
-    pickle_files = ['sample_10000.pk']
+    pickle_files = ['sample_100000.pk']
 
     base_path = '{}_{}'.format(dataset_type, num_resample)
     dim_path = 'S_%d_K_%d' % (power_base, power_base)

@@ -51,6 +51,7 @@ class TaskTemplate:
 
         # Put model on correct device
         self.model.to(get_device())
+        
         self._precompute_stats_for_metrics()
 
     def _precompute_stats_for_metrics(self):
@@ -58,20 +59,21 @@ class TaskTemplate:
         # Pairwise Covariance
         data_path = self.test_dataset.data_path
         self.higher_order_dict_n_abs = {}
-        for n in range(2, min(10, self.model.S)):
-            file = str(n)+'_list_highcov_test_abs.pk'
-            filepath = os.path.join(data_path, file)
+        if self.run_config.dataset=='pair' or self.run_config.dataset=='sort':
+            for n in range(2, min(10, self.model.S)):
+                file = str(n)+'_list_highcov_test_abs.pk'
+                filepath = os.path.join(data_path, file)
 
-            if not os.path.exists(filepath):
-                higher_order_dict_abs = compute_higher_order_stats(
-                    self.test_dataset.np_data, num_patterns=1000, n=n, absolute_version=True)
+                if not os.path.exists(filepath):
+                    higher_order_dict_abs = compute_higher_order_stats(
+                        self.test_dataset.np_data, num_patterns=1000, n=n, absolute_version=True)
 
-                with open(filepath, 'wb') as f:
-                    pk.dump(higher_order_dict_abs, f)
-            else:
-                with open(filepath, 'rb') as f:
-                    higher_order_dict_abs = pk.load(f)
-            self.higher_order_dict_n_abs[n] = higher_order_dict_abs
+                    with open(filepath, 'wb') as f:
+                        pk.dump(higher_order_dict_abs, f)
+                else:
+                    with open(filepath, 'rb') as f:
+                        higher_order_dict_abs = pk.load(f)
+                self.higher_order_dict_n_abs[n] = higher_order_dict_abs
         filepath = os.path.join(data_path, 'training_dict.pk')
         if not os.path.exists(filepath):
             training_dict = self.data_to_dict(
@@ -169,9 +171,10 @@ class TaskTemplate:
         return samples
 
     def __get_sample_stats(self, samples):
-
-        r20_corr_abs = compute_corr_higher_order(
-            samples, self.higher_order_dict_n_abs)
+        r20_corr_abs = []
+        if self.run_config.dataset=='pair' or self.run_config.dataset=='sort':
+            r20_corr_abs = compute_corr_higher_order(
+                samples, self.higher_order_dict_n_abs)
         samples_dict = self.data_to_dict(samples)
         frac_seen_samples = get_frac_overlap(
             self.training_dict, samples_dict)
@@ -251,7 +254,7 @@ class TaskTemplate:
             reverse=False,
             get_ldj_per_layer=True,
             beta=self.beta_scheduler.get(iteration),
-            length=x_length)
+            length=x_length,x_channel_mask=x_channel_mask)
 
         loss = (neg_boundnl / x_length.float()).mean()
         self.summary_dict["ldj"].append(loss.item())
@@ -300,7 +303,8 @@ class TaskTemplate:
                          reverse=False,
                          get_ldj_per_layer=False,
                          beta=1,
-                         length=x_length)
+                         length=x_length,
+                         x_channel_mask=x_channel_mask)
 
         loss = -(ldj / x_length.float()).mean()
         std_loss = (ldj / x_length.float()).std()

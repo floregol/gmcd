@@ -6,7 +6,7 @@ from eval_src.binning import binning_on_samples
 
 
 def compute_NLL(ground_truth_samples, list_of_pmf_q, list_of_title_q,
-                store_results,m_per_splits):
+                store_results, m_per_splits):
     all_log_likelihoods = []
     for i, q_name in enumerate(list_of_title_q):
         log_likelihoods = []
@@ -53,22 +53,28 @@ def compute_norm(p_array, q_array):
         l2 += l2_x
         l1 += l1_x
     l2 = np.sqrt(l2)
-    l1 = l1/2
+    l1 = l1 / 2
     return {'l1': l1, 'l2': l2}
 
-def reject_if_bad_test(prob_array, q_emp_array, m, epsilon=0.1, delta=1/3):
+
+def reject_if_bad_test(prob_array, q_emp_array, m, delta=1 / 3):
     U = len(prob_array)
     empirical_dtv = 0
     for x in range(U):
         tv_x = np.abs(prob_array[x] - q_emp_array[x])
         empirical_dtv += tv_x
-    empirical_dtv = empirical_dtv/2
-    e_test = max(np.sqrt(U/m), np.sqrt(2/m * np.log2(2/delta)))
+    empirical_dtv = empirical_dtv / 2
+    e_test = max(np.sqrt(U / m), np.sqrt(2 / m * np.log2(2 / delta)))
     if empirical_dtv <= e_test:
         test_pass = True
     else:
         test_pass = False
-    return {'close_enough': test_pass, 'e_test':e_test,'emp_dtv':empirical_dtv }
+    return {
+        'close_enough': test_pass,
+        'e_test': e_test,
+        'emp_dtv': empirical_dtv
+    }
+
 
 def perform_our_test(list_of_samples,
                      list_of_title_q,
@@ -78,7 +84,6 @@ def perform_our_test(list_of_samples,
                      ground_truth_p,
                      splits,
                      m_per_splits,
-                     test_epsilon,
                      delta,
                      list_of_pmf_q=None):
     # step one consolidate all samples to one sample set
@@ -86,7 +91,7 @@ def perform_our_test(list_of_samples,
     for all_samples_list in list_of_samples:
         consolidated_samples.append(consolidate(all_samples_list))
 
-    Bs = list(range(S + 1, 9))
+    Bs = list(range(S + 1, 10))
     for B in tqdm(Bs):  # For each bin granularity
 
         for i, consolidated_samples_baseline in enumerate(
@@ -101,7 +106,6 @@ def perform_our_test(list_of_samples,
                 reject_if_bad_test(trial['p'],
                                    trial['q'],
                                    splits * m_per_splits,
-                                   epsilon=test_epsilon,
                                    delta=delta) for trial in list_binned
             ]
             test = [i['close_enough'] for i in results]

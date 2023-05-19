@@ -1,0 +1,7 @@
+Best validation performance: 1.7747642164230346
+Best iteration: 500
+Best checkpoint: checkpoints/sort_2/S_6_K_6/ArgmaxAR/16_05_2023__00_17/cktp/checkpoint_0000500.tar
+Detailed metrics
+-> loss: 1.7747642164230346
+-> std_loss: 0.18665576493740083
+

@@ -1,0 +1,7 @@
+Best validation performance: 1.6604417562484741
+Best iteration: 1000
+Best checkpoint: checkpoints/proxy_CDM/CDM/16_05_2023__20_11/cktp/checkpoint_0001000.tar
+Detailed metrics
+-> loss: 1.6604417562484741
+-> std_loss: 0.256920725107193
+

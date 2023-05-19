@@ -58,7 +58,16 @@ class TrainTemplate:
         sample_eval.add_new_metrics({'time': start - end})
         sample_eval.store(
             os.path.join(self.figure_path, 'sample_{}.pk'.format(NUM_SAMPLES)))
-
+        surrogate_pmf = {}
+        if self.runconfig.dataset == 'real':
+            NUM_SAMPLES = 10000
+            for x in sample_eval.samples_np:
+                if tuple(x) not in surrogate_pmf:
+                    nlog_p_tensor = self.task._eval_batch(torch.Tensor([x]).to('cuda'))['loss'] *x.shape[0]
+                    nlog_p = nlog_p_tensor.detach().cpu().numpy()
+                    surrogate_pmf[tuple(x)] = -nlog_p
+            print(surrogate_pmf)
+            p_total = np.sum([np.exp(log_p) for log_p in surrogate_pmf.values()])
     def train_model(self,
                     max_iterations=1e6,
                     loss_freq=50,
@@ -145,7 +154,7 @@ class TrainTemplate:
             time_per_step.add(end_time - start_time)
             time_per_step_list.append(end_time - start_time)
             train_losses.add(loss.item())
-
+            
             if (index_iter + 1) % loss_freq == 0:
 
                 loss_avg = train_losses.get_mean(reset=True)

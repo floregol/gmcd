@@ -1,0 +1,7 @@
+Best validation performance: 1.7284123594284058
+Best iteration: 6000
+Best checkpoint: checkpoints/pair_2/S_6_K_6/CNF/16_05_2023__14_20/cktp/checkpoint_0006000.tar
+Detailed metrics
+-> loss: 1.7284123594284058
+-> std_loss: 0.17008935515880585
+

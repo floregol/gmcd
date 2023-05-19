@@ -51,13 +51,13 @@ class ArgmaxAr(nn.Module):
         self.run_config.encoder_bins = 4
         self.run_config.type = 'AR'
         if self.S == 6:
-            self.run_config.lstm_size = 32
-            self.run_config.lstm_layers = 2
-            self.run_config.context_lstm_layers = 2
+            self.run_config.lstm_size = 64
+            self.run_config.lstm_layers = 1
+            self.run_config.context_lstm_layers = 1
         elif self.S == 8:
             self.run_config.lstm_size = 64
             self.run_config.lstm_layers = 2
-        elif self.run_config.S == 10:
+        else :
             self.run_config.lstm_size = 128
             self.run_config.lstm_layers = 2
     def sample(self, num_samples, **kwargs):
