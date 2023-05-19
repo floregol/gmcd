@@ -1,13 +1,10 @@
-import numpy as np
-import scipy
-from sklearn.covariance import log_likelihood
-from eval_src.file_helper import create_prefix_from_list, load_generative_model_samples, load_samples, store_for_plotting
+
+from eval_src.file_helper import create_prefix_from_list, store_for_plotting
 import numpy as np
 import random
+from eval_src.generate_omegadelta import convert_to_pattern, preprocess_pmf_p
 from eval_src.load_samples import get_samples_p_q
-
 from eval_src.metric_p import compute_NLL, perform_our_test
-
 from eval_src.table_helper import build_latex_table
 # from table_helper import build_latex_table
 
@@ -92,12 +89,12 @@ if __name__ == '__main__':
         experiment_config['TYPE'] = TYPE
         experiment_config['splits'] = splits
 
-    print("for this round m is ", m_per_splits * splits)
-    print("and U is ", U)
-    metrics = ['S', 'test', 'binning', 'A', 'nll', 'e', 'std_nll', 'l1']
-
     list_of_samples, list_of_title_q, ground_truth_p, list_of_pmf_q = get_samples_p_q(
         experiment, experiment_config)
+
+    print("for this round m is ", experiment_config['m_per_splits'] * splits)
+    print("and U is ", U)
+    metrics = ['S', 'test', 'binning', 'A', 'nll', 'e', 'std_nll', 'l1']
     store_results = {}
     store_results_ranking = {}
 
@@ -108,10 +105,16 @@ if __name__ == '__main__':
         for title in list_of_title_q:
             store_results[metric][title] = {}
     ground_truth_samples = list_of_samples[0]
-    
-    perform_our_test(list_of_samples, list_of_title_q, num_s, trials,
-                     store_results, ground_truth_p, splits, m_per_splits,
-                     delta, list_of_pmf_q)
+
+    if experiment == "PROXY":
+        omegaDelta = preprocess_pmf_p(ground_truth_p, num_s=6)
+        experiment_config['num_s'] = 6
+        list_of_samples, ground_truth_p = convert_to_pattern(
+            omegaDelta, list_of_samples)
+        #experiment_config['num_s'] = len(ground_truth_p)
+
+    perform_our_test(list_of_samples, list_of_title_q, store_results,
+                     ground_truth_p, list_of_pmf_q, experiment_config)
 
     if list_of_pmf_q is not None:
         compute_NLL(ground_truth_samples, list_of_pmf_q, list_of_title_q,

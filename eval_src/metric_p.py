@@ -76,22 +76,15 @@ def reject_if_bad_test(prob_array, q_emp_array, m, delta=1 / 3):
     }
 
 
-def perform_our_test(list_of_samples,
-                     list_of_title_q,
-                     S,
-                     trials,
-                     store_results,
-                     ground_truth_p,
-                     splits,
-                     m_per_splits,
-                     delta,
-                     list_of_pmf_q=None):
+def perform_our_test(list_of_samples, list_of_title_q, store_results,
+                     ground_truth_p, list_of_pmf_q, experiment_config):
+
     # step one consolidate all samples to one sample set
     consolidated_samples = []
     for all_samples_list in list_of_samples:
         consolidated_samples.append(consolidate(all_samples_list))
 
-    Bs = list(range(S + 1, 10))
+    Bs = list(range(experiment_config['num_s'] + 1, 10))
     for B in tqdm(Bs):  # For each bin granularity
 
         for i, consolidated_samples_baseline in enumerate(
@@ -100,13 +93,16 @@ def perform_our_test(list_of_samples,
             if list_of_pmf_q is not None:
                 pmf_q = list_of_pmf_q[i]
             list_binned = binning_on_samples(consolidated_samples_baseline,
-                                             trials, ground_truth_p, B, pmf_q)
+                                             experiment_config['trials'],
+                                             ground_truth_p, B, pmf_q)
             # run statistical test
             results = [
                 reject_if_bad_test(trial['p'],
                                    trial['q'],
-                                   splits * m_per_splits,
-                                   delta=delta) for trial in list_binned
+                                   experiment_config['splits'] *
+                                   experiment_config['m_per_splits'],
+                                   delta=experiment_config['delta'])
+                for trial in list_binned
             ]
             test = [i['close_enough'] for i in results]
             A = [i['emp_dtv'] for i in results]
@@ -127,3 +123,5 @@ def perform_our_test(list_of_samples,
 
             store_results['e'][q_name][B] = error
             store_results['binning'][q_name][B] = list_binned
+
+

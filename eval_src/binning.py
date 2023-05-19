@@ -35,7 +35,7 @@ def binning_on_samples(consolidated_samples, trials, ground_truth_p_dict, B,
                                    B,
                                    seed=trial,
                                    pmf_q=pmf_q)
-        # here its ok to transform the distirbution to an array because the space is supppose to be very small
+        # here its ok to transform the distribution to an array because the space is supppose to be very small
 
         binnned_p_hist = result_dict['new_histo_p']
         binnned_q_hist = result_dict['new_emp_histo_q']

@@ -37,7 +37,7 @@ def train():
 
     run_config = SyntheticRunConfig(dataset='proxy',
                                     S=None,
-                                    model_name='ArgmaxAR')
+                                    model_name='CDM')
     # Setup training
     trainModule = TrainRealModeling(
         run_config,
@@ -58,27 +58,27 @@ def train():
                                         save_freq=run_config.save_freq)
 
 
-    run_config = SyntheticRunConfig(dataset='proxy',
-                                    S=None,
-                                    model_name='CNF')
-    # Setup training
-    trainModule = TrainRealModeling(
-        run_config,
-        batch_size=run_config.batch_size,
-        checkpoint_path=run_config.checkpoint_path,
-        path_experiment='')
-    # store the config of the run
-    args_filename = os.path.join(trainModule.checkpoint_path, "param_config.pk")
+    # run_config = SyntheticRunConfig(dataset='proxy',
+    #                                 S=None,
+    #                                 model_name='CNF')
+    # # Setup training
+    # trainModule = TrainRealModeling(
+    #     run_config,
+    #     batch_size=run_config.batch_size,
+    #     checkpoint_path=run_config.checkpoint_path,
+    #     path_experiment='')
+    # # store the config of the run
+    # args_filename = os.path.join(trainModule.checkpoint_path, "param_config.pk")
 
-    with open(args_filename, "wb") as f:
-        pk.dump(run_config, f)
+    # with open(args_filename, "wb") as f:
+    #     pk.dump(run_config, f)
 
-    # Start training
+    # # Start training
 
-    result = trainModule.train_model(run_config.max_iterations,
-                                     loss_freq=50,
-                                     eval_freq=run_config.eval_freq,
-                                     save_freq=run_config.save_freq)
+    # result = trainModule.train_model(run_config.max_iterations,
+    #                                  loss_freq=50,
+    #                                  eval_freq=run_config.eval_freq,
+    #                                  save_freq=run_config.save_freq)
    
     
     

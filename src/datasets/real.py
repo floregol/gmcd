@@ -7,7 +7,6 @@ from scipy.stats import rv_discrete
 Dataset class for protein dataset. 
 """
 
-
 NUM_ACIDO = 21
 
 
@@ -27,7 +26,7 @@ class RealDataset(data.Dataset):
             p = list(self.pmf.values())
             x = list(self.pmf.keys())
             indices = list(range(len(p)))
-            index_samples = self.sample_pmf(indices , p, m=10000)
+            index_samples = self.sample_pmf(indices, p, m=10000)
             samples = [np.array(x[i]) for i in index_samples]
             self.np_data = np.array(samples)
         else:
@@ -39,20 +38,20 @@ class RealDataset(data.Dataset):
         self.num_classes = NUM_ACIDO
         self.set_size = self.np_data.shape[1]
         self.dataset_size = self.np_data.shape[0]
+        if not dont_generate:
+            self.train_percent = 0.7
+            self.val_percent = 0.1
+            self.test_percent = 0.2
+            int_train = int(self.dataset_size * self.train_percent)
+            int_val = int_train + int(self.dataset_size * self.val_percent)
+            if train:
+                self.index = list(range(0, int_train))
+            if val:
+                self.index = list(range(int_train, int_val))
+            if test:
+                self.index = list(range(int_val, self.dataset_size))
+            self.np_data = self.np_data[self.index, :]
 
-        self.train_percent = 0.7
-        self.val_percent = 0.1
-        self.test_percent = 0.2
-        int_train = int(self.dataset_size*self.train_percent)
-        int_val = int_train+int(self.dataset_size*self.val_percent)
-        if train:
-            self.index = list(range(0, int_train))
-        if val:
-            self.index = list(range(int_train, int_val))
-        if test:
-            self.index = list(range(int_val, self.dataset_size))
-        self.np_data = self.np_data[self.index, :]
-    
     def sample_pmf(self, value, probability, m):
         distrib = rv_discrete(values=(value, probability))
         new_samples = distrib.rvs(size=m)
@@ -78,10 +77,9 @@ class RealDataset(data.Dataset):
         with open(filepath, 'rb') as f:
             data = pk.load(f)
         return data
+
     def __len__(self):
         return len(self.index)
 
     def __getitem__(self, idx):
         return self.np_data[idx, :]
-
-

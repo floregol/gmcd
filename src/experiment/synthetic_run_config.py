@@ -110,7 +110,7 @@ class SyntheticRunConfig(RunConfig):
             self.eval_freq = 500
             self.dataset = dataset
             self.model_name = model_name
-            self.cdm_T = 100
+            self.cdm_T = 500
             self.T = 10
             self.diffusion_steps = self.T
             self.batch_size = 1024
@@ -122,7 +122,7 @@ class SyntheticRunConfig(RunConfig):
             self.transformer_depth = 2
             self.transformer_blocks = 1
             self.transformer_local_heads = 4
-            self.transformer_local_size = 64
+            self.transformer_local_size = 128
             self.alpha = 1.1
             self.corrected_var = 0.5
             if model_name == 'CNF':
