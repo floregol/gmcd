@@ -115,7 +115,7 @@ class SyntheticRunConfig(RunConfig):
             self.diffusion_steps = self.T
             self.batch_size = 1024
             self.encoding_dim = 9
-            self.max_iterations = 1000
+            self.max_iterations = 5000
             self.transformer_dim = 128
             self.input_dp_rate = 0.2
             self.transformer_heads = 8
