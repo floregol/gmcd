@@ -107,8 +107,8 @@ if __name__ == '__main__':
     ground_truth_samples = list_of_samples[0]
 
     if experiment == "PROXY":
-        omegaDelta = preprocess_pmf_p(ground_truth_p, num_s=6)
-        experiment_config['num_s'] = 6
+        omegaDelta = preprocess_pmf_p(ground_truth_p, num_s=2)
+        experiment_config['num_s'] =2 
         list_of_samples, ground_truth_p = convert_to_pattern(
             omegaDelta, list_of_samples)
         #experiment_config['num_s'] = len(ground_truth_p)

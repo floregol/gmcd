@@ -84,7 +84,7 @@ def perform_our_test(list_of_samples, list_of_title_q, store_results,
     for all_samples_list in list_of_samples:
         consolidated_samples.append(consolidate(all_samples_list))
 
-    Bs = list(range(experiment_config['num_s'] + 1, 10))
+    Bs = list(range(experiment_config['num_s'] + 1, 8))
     for B in tqdm(Bs):  # For each bin granularity
 
         for i, consolidated_samples_baseline in enumerate(
