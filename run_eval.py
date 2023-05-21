@@ -85,9 +85,11 @@ if __name__ == '__main__':
     elif experiment == "PROXY":  # if we take q as the generative models we have, we load the samples.
         print('You are running the PROXY model experiment...')
         splits = 10
+        num_s = 3
         TYPE = 'proxy'
         experiment_config['TYPE'] = TYPE
         experiment_config['splits'] = splits
+        experiment_config['num_s'] = num_s
 
     list_of_samples, list_of_title_q, ground_truth_p, list_of_pmf_q = get_samples_p_q(
         experiment, experiment_config)
@@ -107,12 +109,11 @@ if __name__ == '__main__':
     ground_truth_samples = list_of_samples[0]
 
     if experiment == "PROXY":
-        omegaDelta = preprocess_pmf_p(ground_truth_p, num_s=2)
-        experiment_config['num_s'] =2 
+        omegaDelta = preprocess_pmf_p(ground_truth_p, num_s=experiment_config['num_s'])
+      
         list_of_samples, ground_truth_p = convert_to_pattern(
             omegaDelta, list_of_samples)
-        #experiment_config['num_s'] = len(ground_truth_p)
-
+        
     perform_our_test(list_of_samples, list_of_title_q, store_results,
                      ground_truth_p, list_of_pmf_q, experiment_config)
 
@@ -125,21 +126,29 @@ if __name__ == '__main__':
         prefix = create_prefix_from_list({
             'exp': experiment + TYPE,
             'U': U,
-            'm_per_splits': m_per_splits,
+            'm_per_splits': experiment_config['m_per_splits'],
             'splits': splits,
             'S': num_s,
             'ratio': ratio,
             'b': init_b,
             'e': init_e
         })
-    else:
+    elif experiment == "GEN":
         prefix = create_prefix_from_list({
             'exp': experiment + TYPE,
             'U': U,
-            'm_per_splits': m_per_splits,
+            'm_per_splits': experiment_config['m_per_splits'],
             'splits': splits,
             'S': num_s,
             'ratio': ratio
+        })
+    elif experiment == "PROXY":
+        prefix = create_prefix_from_list({
+            'exp': experiment,
+            'U': U,
+            'm_per_splits': experiment_config['m_per_splits'],
+            'splits': splits,
+            'S': num_s
         })
     store_for_plotting(data={'data': store_results}, title=prefix)
 
@@ -161,5 +170,5 @@ if __name__ == '__main__':
         #top = top + [ '$tv$']
     build_latex_table([top] + rows,
                       caption=TYPE + ' m/Omega' + float_to_print(
-                          (m_per_splits * splits) / U) + ' S:' + str(num_s),
+                          (experiment_config['m_per_splits'] * splits) / U) + ' S:' + str(num_s),
                       label=prefix)
