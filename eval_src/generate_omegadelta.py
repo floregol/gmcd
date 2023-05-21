@@ -16,7 +16,7 @@ class OmegaDelta():
             np.sum([p for i, p in val])
             for key, val in self.Omega_Delta_dict_native.items()
         ]
-
+        print('should be one', np.sum(self.flatten_pmf))
         start_interval = 0
         self.ground_truth_p = {}
         for key, val in self.Omega_Delta_dict_native.items():
@@ -67,7 +67,7 @@ def preprocess_pmf_p(ground_truth_p, num_s):
         seq_to_native_index[tuple(x)] = i
         native_index_to_seq[i] = tuple(x)
 
-        parti_index = int(p_sorted[i] / delta) - 1
+        parti_index = int(p_sorted[i] / delta)
         if parti_index not in Omega_Delta_dict_native:
             Omega_Delta_dict_native[parti_index] = [(i, p_sorted[i])]
         else:
