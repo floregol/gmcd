@@ -9,7 +9,9 @@ from eval_src.table_helper import build_latex_table
 # from table_helper import build_latex_table
 
 
-def float_to_print(number, num_d=3):
+def float_to_print(number, num_d=7):
+    if num_d == 7:
+        return '{:.7f}'.format(number)
     if num_d == 3:
         return '{:.3f}'.format(number)
     elif num_d == 2:
@@ -160,7 +162,7 @@ if __name__ == '__main__':
 
         for key, val in store_results['A'][q_name].items():
             std = np.mean((store_results['e'][q_name][key]))
-            values.append(float_to_print(np.mean(val), num_d=3))
+            values.append(float_to_print(np.mean(val), num_d=7))
         rows.append([q_name] + values)
     top = ['']
     if list_of_pmf_q is not None:
