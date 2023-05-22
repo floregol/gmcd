@@ -49,7 +49,7 @@ class TrainTemplate:
         self.lr_minimum = optimizer_params.lr_minimum
 
     def store_pmf_samples(self):
-        NUM_SAMPLES = 1000
+        NUM_SAMPLES = 100000
         sample_eval = self.task.evaluate_sample(num_samples=NUM_SAMPLES)
         print('creating dataset from {0} samples of surrogate model'.format(
             NUM_SAMPLES))

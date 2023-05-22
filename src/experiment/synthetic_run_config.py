@@ -130,7 +130,7 @@ class SyntheticRunConfig(RunConfig):
             self.alpha = 1.1
             self.corrected_var = 0.5
             if dataset == 'real':
-                self.max_iterations = 50
+                self.max_iterations = 1000
             # if model_name == 'CNF':
                     
             #         self.categ_encoding_num_dimensions = 4
