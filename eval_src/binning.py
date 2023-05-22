@@ -164,6 +164,7 @@ def p_to_bp_algo(ground_truth_p_dict, q_dict, B, seed, pmf_q):
             'new_emp_histo_q': new_emp_histo_q,
             'new_histo_q': new_histo_q
         }
+    print(new_emp_histo_q)
     return {'new_histo_p': new_histo_p, 'new_emp_histo_q': new_emp_histo_q}
 
 

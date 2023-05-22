@@ -8,7 +8,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "run_eval.py",
+            "program": "run_real_extension.py",
             "console": "integratedTerminal"
         }
     ]

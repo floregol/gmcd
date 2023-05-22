@@ -4,6 +4,7 @@ from src.experiment.synthetic_run_config import SyntheticRunConfig
 from src.experiment.synthetic_train import start_training
 import os
 import pickle as pk
+
 def pretrain_surrogate_model():
     run_config = SyntheticRunConfig(dataset='real',
                                     S=None,

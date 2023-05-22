@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from tqdm import tqdm
+import pickle as pk
 import torch.nn as nn
 import torch
 import time
@@ -48,26 +48,43 @@ class TrainTemplate:
             gamma=optimizer_params.lr_decay_factor)
         self.lr_minimum = optimizer_params.lr_minimum
 
-    def complete_evaluation(self):
-        print('Starting the eval for ')
-        
-        NUM_SAMPLES = 100000
-        start = time.time()
+    def store_pmf_samples(self):
+        NUM_SAMPLES = 1000
         sample_eval = self.task.evaluate_sample(num_samples=NUM_SAMPLES)
-        end = time.time()
-        sample_eval.add_new_metrics({'time': start - end})
-        sample_eval.store(
-            os.path.join(self.figure_path, 'sample_{}.pk'.format(NUM_SAMPLES)))
+        print('creating dataset from {0} samples of surrogate model'.format(
+            NUM_SAMPLES))
         surrogate_pmf = {}
+
+        for x in sample_eval.samples_np:
+            if tuple(x) not in surrogate_pmf:
+                nlog_p_tensor = self.task._eval_batch(
+                    torch.Tensor([x]).to('cuda'))['loss'] * x.shape[0]
+                nlog_p = nlog_p_tensor.detach().cpu().numpy()
+                surrogate_pmf[tuple(x)] = -nlog_p
+       
+        real_p = [ np.exp(log_p, dtype=np.double) for log_p in surrogate_pmf.values() ]
+        p_total = np.sum(real_p)
+        new_pmf = [p/p_total for p in real_p]
+        dict_pmf = dict(zip(surrogate_pmf.keys(), new_pmf))
+        dataset_path = os.path.join('src/datasets', 'PF00014_proxy.pk')
+        with open(dataset_path, "wb") as f:
+            pk.dump(dict_pmf, f)
+
+    def complete_evaluation(self):
+        print('Starting the eval.... ')
+
         if self.runconfig.dataset == 'real':
-            NUM_SAMPLES = 10000
-            for x in sample_eval.samples_np:
-                if tuple(x) not in surrogate_pmf:
-                    nlog_p_tensor = self.task._eval_batch(torch.Tensor([x]).to('cuda'))['loss'] *x.shape[0]
-                    nlog_p = nlog_p_tensor.detach().cpu().numpy()
-                    surrogate_pmf[tuple(x)] = -nlog_p
-            print(surrogate_pmf)
-            p_total = np.sum([np.exp(log_p) for log_p in surrogate_pmf.values()])
+            self.store_pmf_samples()
+        else:
+            NUM_SAMPLES = 100000
+            start = time.time()
+            sample_eval = self.task.evaluate_sample(num_samples=NUM_SAMPLES)
+            end = time.time()
+            sample_eval.add_new_metrics({'time': start - end})
+            sample_eval.store(
+                os.path.join(self.figure_path,
+                             'sample_{}.pk'.format(NUM_SAMPLES)))
+
     def train_model(self,
                     max_iterations=1e6,
                     loss_freq=50,
@@ -89,7 +106,7 @@ class TrainTemplate:
         last_save = None
 
         test_NLL = None  # Possible test performance determined in the end of the training
-        
+
         def save_train_model(index_iter):
             return save_train_model_fun(no_model_checkpoints,
                                         best_save_dict,
@@ -111,7 +128,7 @@ class TrainTemplate:
         print("=" * 50 + "\nStarting training...\n" + "=" * 50)
 
         print("Performing initial evaluation...")
-        
+
         detailed_scores = self.task.eval(initial_eval=True)
         start = time.time()
         sample_metrics = self.task.evaluate_sample(
@@ -154,7 +171,7 @@ class TrainTemplate:
             time_per_step.add(end_time - start_time)
             time_per_step_list.append(end_time - start_time)
             train_losses.add(loss.item())
-            
+
             if (index_iter + 1) % loss_freq == 0:
 
                 loss_avg = train_losses.get_mean(reset=True)
@@ -194,7 +211,7 @@ class TrainTemplate:
                         print(
                             'The model is overfitting to the training samples...'
                         )
-                        keep_going = False
+                        keep_going = True
                 self.model.train()
                 detailed_scores_to_tensorboard = sample_metrics.get_printable_metrics_dict(
                 )
