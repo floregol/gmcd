@@ -87,7 +87,7 @@ if __name__ == '__main__':
     elif experiment == "PROXY":  # if we take q as the generative models we have, we load the samples.
         print('You are running the PROXY model experiment...')
         splits = 10
-        num_s = 3
+        num_s = 4
         TYPE = 'proxy'
         experiment_config['TYPE'] = TYPE
         experiment_config['splits'] = splits

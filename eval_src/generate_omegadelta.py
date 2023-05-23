@@ -1,5 +1,5 @@
 import numpy as np
-
+import math
 
 class OmegaDelta():
     def __init__(self, seq_to_native_index, native_index_to_seq, Delta,
@@ -54,27 +54,46 @@ def preprocess_pmf_p(ground_truth_p, num_s):
     sorting_indices = np.argsort(p)
     p_sorted = np.array(p)[sorting_indices]
     x_sorted = np.array(xs)[sorting_indices]
+    using_omega_delta = False
+    if using_omega_delta:
+        p_min = p_sorted[0]
+        p_max = p_sorted[-1]
+        Delta = (p_max - p_min) / (num_s - 1)
+        assert Delta > 0
+        # generate bins
+        Omega_Delta_dict_native = {}
+        seq_to_native_index = {}
+        native_index_to_seq = {}
+        for i, x in enumerate(x_sorted):
+            seq_to_native_index[tuple(x)] = i
+            native_index_to_seq[i] = tuple(x)
 
-    p_min = p_sorted[0]
-    p_max = p_sorted[-1]
-    delta = (p_max - p_min) / (num_s - 1)
-    assert delta > 0
-    # generate bins
-    Omega_Delta_dict_native = {}
-    seq_to_native_index = {}
-    native_index_to_seq = {}
-    for i, x in enumerate(x_sorted):
-        seq_to_native_index[tuple(x)] = i
-        native_index_to_seq[i] = tuple(x)
+            parti_index = int(p_sorted[i] / Delta)
+            if parti_index not in Omega_Delta_dict_native:
+                Omega_Delta_dict_native[parti_index] = [(i, p_sorted[i])]
+            else:
+                Omega_Delta_dict_native[parti_index].append((i, p_sorted[i]))
+    else:
+        print('not using omega delta...')
+       
+        # generate bins
+        Delta = None
+        Omega_Delta_dict_native = {}
+        seq_to_native_index = {}
+        native_index_to_seq = {}
+        size_partitions = math.ceil(len(x_sorted)/(num_s-1))
+        for i, x in enumerate(x_sorted):
+            seq_to_native_index[tuple(x)] = i
+            native_index_to_seq[i] = tuple(x)
 
-        parti_index = int(p_sorted[i] / delta)
-        if parti_index not in Omega_Delta_dict_native:
-            Omega_Delta_dict_native[parti_index] = [(i, p_sorted[i])]
-        else:
-            Omega_Delta_dict_native[parti_index].append((i, p_sorted[i]))
-
-    omegaDelta = OmegaDelta(seq_to_native_index, native_index_to_seq, delta,
+            parti_index = int(i/size_partitions)
+            if parti_index not in Omega_Delta_dict_native:
+                Omega_Delta_dict_native[parti_index] = [(i, p_sorted[i])]
+            else:
+                Omega_Delta_dict_native[parti_index].append((i, p_sorted[i]))
+    omegaDelta = OmegaDelta(seq_to_native_index, native_index_to_seq, Delta,
                             Omega_Delta_dict_native)
+    assert len(Omega_Delta_dict_native) == num_s-1
     print('we are loosing {0} by cutting in {1}'.format(
         omegaDelta.p_tv_total, num_s))
 
